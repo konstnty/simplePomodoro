@@ -24,31 +24,37 @@ void delay(ms) {
 }
 
 int counter() {
-    while(!kbhit() && flag == 0) {
-        if (minute > 59) {
+    while(!kbhit()) {
+        if (minute > 24 && flag == 0) {
             minute = 0;
-            ++hour;
+            flag = 1;
+        } else if (minute > 4 && flag == 1) {
+            minute = 0;
+            flag = 0;
         }
         if (second > 59) {
             second = 0;
             ++minute;
         }
         printData();
-        delay(1000);
+        delay(1000000);
         ++second;
     }
 }
 
 int printData() {
     system("clear");
-    printf("1.Start 2.Stop 3.Reset 4.End\n");
+    if (flag == 0)
+        printf("Work time\n");
+    else
+        printf("Break time\n");
     printf("============================\n");
     printf("            %d:%d:%d",hour,minute,second);
     printf("\n============================\n");
 }
 
 int main() {
-    counter();
-    printData();
+    while (1)
+        counter();
     return 0;
 }
