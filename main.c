@@ -26,9 +26,12 @@ void delay(ms) {
 int counter() {
     while(!kbhit()) {
         if (minute > 24 && flag == 0) {
+            // idk how to beep without sudo or without beep
+            system("sudo env -i beep -l 500");
             minute = 0;
             flag = 1;
         } else if (minute > 4 && flag == 1) {
+            system("sudo env -i beep -f 500 -r 2");
             minute = 0;
             flag = 0;
         }
@@ -45,15 +48,16 @@ int counter() {
 int printData() {
     system("clear");
     if (flag == 0)
-        printf("Work time\n");
+        printf("          Study time\n");
     else
-        printf("Break time\n");
+        printf("          Break time\n");
     printf("============================\n");
     printf("            %d:%d:%d",hour,minute,second);
     printf("\n============================\n");
 }
 
 int main() {
+    system("sudo env -i beep -f 500 -r 2");
     while (1)
         counter();
     return 0;
