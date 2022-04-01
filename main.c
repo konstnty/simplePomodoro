@@ -48,12 +48,12 @@ int counter() {
 int printData() {
     system("clear");
     if (flag == 0)
-        printf("       Study\n");
+        printf("         Study\n");
     else
-        printf("       Break\n");
-    printf("=============\n");
+        printf("         Break\n");
+    printf("===============\n");
     printf(" %d:%d:%d",hour,minute,second);
-    printf("\n=============\n");
+    printf("\n===============\n");
 }
 
 int main() {
