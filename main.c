@@ -26,12 +26,11 @@ void delay(ms) {
 int counter() {
     while(!kbhit()) {
         if (minute > 24 && flag == 0) {
-            // idk how to beep without sudo or without beep
-            system("sudo env -i beep -l 500");
+            system("mpv bell_sound.wav &");
             minute = 0;
             flag = 1;
         } else if (minute > 4 && flag == 1) {
-            system("sudo env -i beep -f 500 -r 2");
+            system("mpv start_sound.wav &");
             minute = 0;
             flag = 0;
         }
@@ -57,7 +56,7 @@ int printData() {
 }
 
 int main() {
-    system("sudo env -i beep -f 500 -r 2");
+    system("mpv start_sound.wav &"); // push to the background
     while (1)
         counter();
     return 0;
