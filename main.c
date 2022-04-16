@@ -59,6 +59,7 @@ int printData() {
 int main() {
     system("mpv start_sound.wav > /dev/null 2>&1 & disown"); // push to the background
     counter();
+    system("mpv stop_sound.wav > /dev/null 2>&1 & disown");
     system("clear");
     printf("good sesh lad\n");
 }
