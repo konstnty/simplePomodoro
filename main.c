@@ -16,7 +16,7 @@ int kbhit() {
     return FD_ISSET(STDIN_FILENO, &fds);
 }
 
-int hour=0;minute=0;second=0;flag=0;
+int hour=0;minute=0;second=0;flag=0;cur_rep=1;rep_amnt=2;
 
 void delay(ms) {
     clock_t timeDelay = ms + clock();
@@ -24,13 +24,14 @@ void delay(ms) {
 }
 
 int counter() {
-    while(!kbhit()) {
+    while(!kbhit() && (cur_rep - 1) != rep_amnt) {
         if (minute > 24 && flag == 0) {
-            system("mpv bell_sound.wav &");
+            system("mpv bell_sound.wav > /dev/null 2>&1 & disown");
             minute = 0;
             flag = 1;
         } else if (minute > 4 && flag == 1) {
-            system("mpv start_sound.wav &");
+            cur_rep++;
+            if ((cur_rep - 1) != rep_amnt) { system("mpv start_sound.wav > /dev/null 2>&1 & disown"); }
             minute = 0;
             flag = 0;
         }
@@ -47,17 +48,17 @@ int counter() {
 int printData() {
     system("clear");
     if (flag == 0)
-        printf("         Study\n");
+        printf("       Study %d\n", cur_rep);
     else
-        printf("         Break\n");
+        printf("         Break %d\n", cur_rep);
     printf("===============\n");
     printf(" %d:%d:%d",hour,minute,second);
     printf("\n===============\n");
 }
 
 int main() {
-    system("mpv start_sound.wav &"); // push to the background
-    while (1)
-        counter();
-    return 0;
+    system("mpv start_sound.wav > /dev/null 2>&1 & disown"); // push to the background
+    counter();
+    system("clear");
+    printf("good sesh lad\n");
 }
