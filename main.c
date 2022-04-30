@@ -28,16 +28,16 @@ void delay(int ms) {
 int counter() {
     while(!kbhit() && (cur_rep) != rep_amnt) {
         if (minute > wrk_amnt && flag == 0) {
-            if (tmw == 1) { system("timew stop"); }
-            system("mpv bell_sound.wav > /dev/null 2>&1 & disown");
             minute = 0;
             flag = 1;
+            system("mpv bell_sound.wav > /dev/null 2>&1 & disown");
+            if (tmw == 1) { system("timew stop > /dev/null"); }
         } else if (minute > brk_amnt && flag == 1) {
-            if (tmw == 1) { system("timew start uni"); }
-            cur_rep++;
-            if ((cur_rep) != rep_amnt) { system("mpv start_sound.wav > /dev/null 2>&1 & disown"); }
+            ++cur_rep;
             minute = 0;
             flag = 0;
+            if ((cur_rep) != rep_amnt) { system("mpv start_sound.wav > /dev/null 2>&1 & disown"); }
+            if (tmw == 1) { system("timew start uni > /dev/null"); }
         }
         if (second > 59) {
             second = 0;
@@ -71,10 +71,10 @@ int main() {
     scanf("%d", &tmw);
 
     system("mpv start_sound.wav > /dev/null 2>&1 & disown");
-    if (tmw == 1) {  system("timew start uni"); }
+    if (tmw == 1) {  system("timew start uni > /dev/null"); }
     counter();
     system("mpv stop_sound.wav > /dev/null 2>&1 & disown");
-    if (tmw == 1) { system("timew stop"); }
+    if (tmw == 1) { system("timew stop > /dev/nyll"); }
     system("clear");
     printf("good sesh lad\n");
 }
