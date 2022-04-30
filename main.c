@@ -5,6 +5,7 @@
 #include <unistd.h>
 
 // kbhit only in conio.h? not anymore
+// tbh still some problems with, it catches the input but doesnt act on it
 int kbhit() {
     struct timeval tv;
     fd_set fds;
@@ -16,22 +17,23 @@ int kbhit() {
     return FD_ISSET(STDIN_FILENO, &fds);
 }
 
-int hour=0;minute=0;second=0;flag=0;cur_rep=1;rep_amnt=2;
+int hour=0;minute=0;second=0;flag=0;
+int wrk_amnt;brk_amnt;cur_rep=0;rep_amnt;
 
-void delay(ms) {
+void delay(int ms) {
     clock_t timeDelay = ms + clock();
     while(timeDelay > clock());
 }
 
 int counter() {
-    while(!kbhit() && (cur_rep - 1) != rep_amnt) {
-        if (minute > 24 && flag == 0) {
+    while(!kbhit() && (cur_rep) != rep_amnt) {
+        if (minute > wrk_amnt && flag == 0) {
             system("mpv bell_sound.wav > /dev/null 2>&1 & disown");
             minute = 0;
             flag = 1;
-        } else if (minute > 4 && flag == 1) {
+        } else if (minute > brk_amnt && flag == 1) {
             cur_rep++;
-            if ((cur_rep - 1) != rep_amnt) { system("mpv start_sound.wav > /dev/null 2>&1 & disown"); }
+            if ((cur_rep) != rep_amnt) { system("mpv start_sound.wav > /dev/null 2>&1 & disown"); }
             minute = 0;
             flag = 0;
         }
@@ -48,16 +50,22 @@ int counter() {
 int printData() {
     system("clear");
     if (flag == 0)
-        printf("       Study %d\n", cur_rep);
+        printf("       Study %d\n", cur_rep + 1);
     else
-        printf("         Break %d\n", cur_rep);
+        printf("         Break %d\n", cur_rep + 1);
     printf("===============\n");
     printf(" %d:%d:%d",hour,minute,second);
     printf("\n===============\n");
 }
 
 int main() {
-    system("mpv start_sound.wav > /dev/null 2>&1 & disown"); // push to the background
+    printf("Rep amount: ");
+    scanf("%d", &rep_amnt);
+    printf("Work length: ");
+    scanf("%d", &wrk_amnt);
+    printf("Break length: ");
+    scanf("%d", &brk_amnt);
+    system("mpv start_sound.wav > /dev/null 2>&1 & disown");
     counter();
     system("mpv stop_sound.wav > /dev/null 2>&1 & disown");
     system("clear");
