@@ -71,10 +71,10 @@ int main() {
     scanf("%d", &tmw);
 
     system("mpv start_sound.wav > /dev/null 2>&1 & disown");
-    system("timew start uni");
+    if (tmw == 1) {  system("timew start uni"); }
     counter();
     system("mpv stop_sound.wav > /dev/null 2>&1 & disown");
-    system("timew stop");
+    if (tmw == 1) { system("timew stop"); }
     system("clear");
     printf("good sesh lad\n");
 }
