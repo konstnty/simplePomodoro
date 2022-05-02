@@ -18,7 +18,7 @@ int kbhit() {
 }
 
 int hour=0;minute=0;second=0;flag=0;
-int wrk_amnt;brk_amnt;cur_rep=0;rep_amnt;tmw;
+int cur_rep=0;rep_amnt=2;
 
 void delay(int ms) {
     clock_t timeDelay = ms + clock();
@@ -27,17 +27,15 @@ void delay(int ms) {
 
 int counter() {
     while(!kbhit() && (cur_rep) != rep_amnt) {
-        if (minute > wrk_amnt && flag == 0) {
+        if (minute > 50 && flag == 0) {
             minute = 0;
             flag = 1;
-            system("mpv bell_sound.wav > /dev/null 2>&1 & disown");
-            if (tmw == 1) { system("timew stop > /dev/null"); }
-        } else if (minute > brk_amnt && flag == 1) {
+            system("mpv bell_sound.wav > /dev/null 2>&1 & disown ");
+        } else if (minute > 10 && flag == 1) {
             ++cur_rep;
             minute = 0;
             flag = 0;
             if ((cur_rep) != rep_amnt) { system("mpv start_sound.wav > /dev/null 2>&1 & disown"); }
-            if (tmw == 1) { system("timew start uni > /dev/null"); }
         }
         if (second > 59) {
             second = 0;
@@ -61,20 +59,9 @@ int printData() {
 }
 
 int main() {
-    printf("Rep amount: ");
-    scanf("%d", &rep_amnt);
-    printf("Work length: ");
-    scanf("%d", &wrk_amnt);
-    printf("Break length: ");
-    scanf("%d", &brk_amnt);
-    printf("Timew integration? ");
-    scanf("%d", &tmw);
-
     system("mpv start_sound.wav > /dev/null 2>&1 & disown");
-    if (tmw == 1) {  system("timew start uni > /dev/null"); }
     counter();
     system("mpv stop_sound.wav > /dev/null 2>&1 & disown");
-    if (tmw == 1) { system("timew stop > /dev/nyll"); }
     system("clear");
     printf("good sesh lad\n");
 }
