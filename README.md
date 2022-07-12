@@ -1,7 +1,7 @@
-run a
+run simple
 
 TO DO:
-- user interface (ability to change time intervals, stop, start, restart, ...)
+- user interface (stop, start, restart, ...)
 
 REQUIRES:
 - mpv

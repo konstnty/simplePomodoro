@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <time.h>
 #include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include <ncurses.h>
 #include <unistd.h>
 
@@ -9,16 +10,35 @@ void printTerm();
 int flag = 0;
 
 int main() {
-    int rep_amnt = 0, sesh_length = 0, brk_amnt = 0;
+    int rep_amnt , sesh_length , brk_amnt, sett;
+    FILE *ptr;
+    printf("Do you want to use last settings 10? ");
+    scanf("%d", &sett);
+    if ( sett == 1 ) {
+        char data[5][5];
+        int line = 0;
+        ptr = fopen("settings.txt", "r");
+        while (!feof(ptr) && !ferror(ptr))
+            if (fgets(data[line], 5, ptr) != NULL)
+                line++;
+        rep_amnt = atoi(data[0]);
+        sesh_length = atoi(data[1]);
+        brk_amnt = atoi(data[2]);
+        fclose(ptr);
+    } else {
+        ptr = fopen("settings.txt", "w");
+        printf("How many reps, how long the sesh and break: ");
+        scanf("%d %d %d", &rep_amnt, &sesh_length, &brk_amnt);
+        fprintf(ptr, "%d\n%d\n%d", rep_amnt, sesh_length, brk_amnt);
+        fclose(ptr);
+    }
 
-    printf("How many reps, how long the sesh and break: ");
-    scanf("%d %d %d", &rep_amnt, &sesh_length, &brk_amnt);
 
     system("mpv start_sound.wav > /dev/null 2>&1 & disown");
     system("mpv start_sound.wav > /dev/null 2>&1 & disown");
     counter(rep_amnt, sesh_length, brk_amnt);
     system("mpv stop_sound.wav > /dev/null 2>&1 & disown");
-    system("clear");
+//    system("clear");
     return 0;
 }
 
