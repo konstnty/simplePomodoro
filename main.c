@@ -1,58 +1,71 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <termios.h>
+#include <unistd.h>
 #include <time.h>
-#include <ncurses.h>
-
-#define RESET       0
-#define BRIGHT 		1
-#define DIM		    2
-#define UNDERLINE 	3
-#define BLINK		4
-#define REVERSE		7
-#define HIDDEN		8
-
-#define BLACK 		0
-#define RED		    1
-#define GREEN		2
-#define YELLOW		3
-#define BLUE		4
-#define MAGENTA		5
-#define CYAN		6
-#define	WHITE		7
+#include <string.h>
+#include "main.h"
 
 int counter();
 void printTerm();
 int flag = 0;
 void setNewTime();
 void readOldTime();
-void textcolor(int attr, int fg);
 
 int main() {
-    int rep_amnt , sesh_length , brk_amnt, sett;
-    printf("1) start with last used time\n2) start with a new time\n3) toggle timew integration [ON\\OFF]\xAInput: ");
-    scanf("%d", &sett);
-    switch(sett) {
-        case 1 :
-            readOldTime(&rep_amnt, &sesh_length, &brk_amnt);
-            break;
-        case 2 :
-            setNewTime();
-            break;
-        case 3 :
-            //to implement
-            break;
-        default :
-            printf("You weren't suppose to get here you know?\n");
-            return 1;
-    }
+    static struct termios oldt, newt;
+
+    // setting terminal to accept input without enter
+    tcgetattr(STDIN_FILENO, &oldt);
+    newt = oldt;
+
+    newt.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
+    int n=3, num=1;
+    Option** optionMenu = malloc(n * sizeof(Option*));
+    optionMenu[0] = addOption("last used time\n");
+    optionMenu[1] = addOption("new time\n");
+    optionMenu[2] = addOption("toggle timew integration\n");
+
+    int rep, sesh, brk;
+    int position = 0;
+    int sett, esc = 0;
+    do {
+        switch(sett) {
+            case 'j' :
+                (position == 2) ? position = 2 : position++;
+                break;
+            case 'k' :
+                (position == 0) ? position = 0 : position--;
+                break;
+            case '\n' :
+                if (position == 0) readOldTime(&rep, &sesh, &brk);
+                esc = 1;
+                break;
+            default :
+                break;
+        }
+        if (esc == 1) break;
+
+        system("clear");
+        for (int i=0; i<n; i++) {
+            (i != position) ? printOption(optionMenu[i])
+                            : printOptionCol(optionMenu[i]);
+        }
+    } while ((sett=getchar()) != 'q');
 
 
     system("mpv sounds/start_sound.wav > /dev/null 2>&1 & disown");
     system("mpv sounds/start_sound.wav > /dev/null 2>&1 & disown");
-    counter(rep_amnt, sesh_length, brk_amnt);
+    counter(rep, sesh, brk);
     system("mpv sounds/stop_sound.wav > /dev/null 2>&1 & disown");
     system("clear");
-    return 0;
+
+    // reseting terminal to old settings
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    printf("\n");
+    exit(EXIT_SUCCESS);
 }
 
 void readOldTime(int *rep, int *sesh, int *brk) {
@@ -117,9 +130,3 @@ void printTerm(int cur_rep, int min, int sec) {
     printf("\n================\n");
 }
 
-void textcolor(int attr, int fg) {
-    char command[13];
-
-    sprintf(command, "%c[%d;%dm", 0x1B, attr, fg + 30);
-    printf("%s", command);
-}
