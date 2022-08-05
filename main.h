@@ -19,6 +19,16 @@
 #define	WHITE		7
 
 
+/* prinitng colored output on linux by adding escape codes before string*/
+void textcolor(int attr, int fg) {
+    char command[13];
+
+    sprintf(command, "%c[%d;%dm", 0x1B, attr, fg + 30);
+    printf("%s", command);
+}
+
+
+/* option struct and print functions */
 typedef struct Option {
     char text[100];
 } Option;
@@ -40,10 +50,4 @@ void printOptionCol(const Option *self) {
     textcolor(RESET, WHITE);
 }
 
-void textcolor(int attr, int fg) {
-    char command[13];
-
-    sprintf(command, "%c[%d;%dm", 0x1B, attr, fg + 30);
-    printf("%s", command);
-}
 #endif

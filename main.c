@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <time.h>
 #include <string.h>
+#include <sys/ioctl.h>
 #include "main.h"
 
 int counter();
@@ -14,6 +15,8 @@ void readOldTime();
 
 int main() {
     static struct termios oldt, newt;
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
     // setting terminal to accept input without enter
     tcgetattr(STDIN_FILENO, &oldt);
@@ -22,11 +25,11 @@ int main() {
     newt.c_lflag &= ~(ICANON | ECHO);
     tcsetattr(STDIN_FILENO, TCSANOW, &newt);
 
-    int n=3, num=1;
+    int n=2, num=1;
     Option** optionMenu = malloc(n * sizeof(Option*));
     optionMenu[0] = addOption("last used time\n");
     optionMenu[1] = addOption("new time\n");
-    optionMenu[2] = addOption("toggle timew integration\n");
+//     optionMenu[2] = addOption("toggle timew integration\n");
 
     int rep, sesh, brk;
     int position = 0;
@@ -34,13 +37,15 @@ int main() {
     do {
         switch(sett) {
             case 'j' :
-                (position == 2) ? position = 2 : position++;
+                (position == n-1) ? position = n-1 : position++;
                 break;
             case 'k' :
                 (position == 0) ? position = 0 : position--;
                 break;
             case '\n' :
+                tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
                 if (position == 0) readOldTime(&rep, &sesh, &brk);
+                else if (position == 1) setNewTime(&rep, &sesh, &brk);
                 esc = 1;
                 break;
             default :
@@ -50,6 +55,7 @@ int main() {
 
         system("clear");
         for (int i=0; i<n; i++) {
+            for (int i=0; i<(w.ws_col/2 - 7); i++) { printf(" "); }
             (i != position) ? printOption(optionMenu[i])
                             : printOptionCol(optionMenu[i]);
         }

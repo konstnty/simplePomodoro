@@ -1,4 +1,4 @@
-./simple to run
+run make
 
 TO DO:
 - user interface (stop, start, restart, ...)
