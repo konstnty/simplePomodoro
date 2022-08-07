@@ -6,19 +6,16 @@
 #include <string.h>
 #include <sys/ioctl.h>
 #include "main.h"
+#include "kbhit.h"
 
 int counter();
 void printTerm();
 int flag = 0;
-void setNewTime();
-void readOldTime();
 
 int main() {
     static struct termios oldt, newt;
-    struct winsize w;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
-    // setting terminal to accept input without enter
+    /* setting terminal to accept input without enter */
     tcgetattr(STDIN_FILENO, &oldt);
     newt = oldt;
 
@@ -45,15 +42,18 @@ int main() {
             case '\n' :
                 tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
                 if (position == 0) readOldTime(&rep, &sesh, &brk);
-                else if (position == 1) setNewTime(&rep, &sesh, &brk);
+                else if (position == 1) setNewTime(&rep, &sesh, &brk); readOldTime(&rep, &sesh, &brk);
                 esc = 1;
                 break;
             default :
                 break;
         }
         if (esc == 1) break;
-
         system("clear");
+
+        /* creates struct with window size */
+        struct winsize w;
+        ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
         for (int i=0; i<n; i++) {
             for (int i=0; i<(w.ws_col/2 - 7); i++) { printf(" "); }
             (i != position) ? printOption(optionMenu[i])
@@ -68,36 +68,13 @@ int main() {
     system("mpv sounds/stop_sound.wav > /dev/null 2>&1 & disown");
     system("clear");
 
-    // reseting terminal to old settings
+    /* reseting terminal to old settings */
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
     printf("\n");
     exit(EXIT_SUCCESS);
 }
 
-void readOldTime(int *rep, int *sesh, int *brk) {
-    FILE *file;
-    char buffer[5][5];
-    int line = 0;
-    file = fopen("settings.txt", "r");
-    while (!feof(file) && !ferror(file))
-        if (fgets(buffer[line], 5, file) != NULL)
-            line++;
-    *rep = atoi(buffer[0]);
-    *sesh = atoi(buffer[1]);
-    *brk = atoi(buffer[2]);
-    fclose(file);
-}
-
-void setNewTime(int *rep, int *sesh, int *brk) {
-    FILE *file;
-    file = fopen("settings.txt", "w");
-    printf("How many reps, how long the sesh and break: ");
-    scanf("%d %d %d", &rep, &sesh, &brk);
-    fprintf(file, "%d\n%d\n%d", rep, sesh, brk);
-    fclose(file);
-}
-
-// checks if state should be switched (break, study)
+/* checks if state should be switched (break, study) */
 int counter(int rep, int sesh, int brk) {
     int cur_rep = 0; int min = 0, sec = 0;
     while (cur_rep != rep) {
@@ -117,22 +94,43 @@ int counter(int rep, int sesh, int brk) {
             sec = 0;
             ++min;
         }
-        while (now - time(NULL) == 0) { }
+
+        while (now - time(NULL) == 0) {
+            if(!kbhit()) continue;
+
+            switch(getchar()) {
+                case 'q':
+                    exit(EXIT_SUCCESS);
+                case 'p':
+                    printf("Paused ");
+                    while(getchar() != 'p') {  }
+                    break;
+            }
+
+        }
         printTerm(cur_rep, min, sec);
         ++sec;
     }
+    main();
 }
 
 
-// prints onto terminal
+/* prints to terminal */
 void printTerm(int cur_rep, int min, int sec) {
     system("clear");
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+    for (int i=0; i<(w.ws_col/2 - 7); i++) { printf(" "); }
     if (flag == 0)
         printf("       Study %d\n", cur_rep + 1);
     else
         printf("         Break %d\n", cur_rep + 1);
+    for (int i=0; i<(w.ws_col/2 - 7); i++) { printf(" "); }
     printf("================\n");
+    for (int i=0; i<(w.ws_col/2 - 7); i++) { printf(" "); }
     printf("\t%.2d:%.2d", min, sec);
-    printf("\n================\n");
+    printf("\n");
+    for (int i=0; i<(w.ws_col/2 - 7); i++) { printf(" "); }
+    printf("================\n");
 }
 
