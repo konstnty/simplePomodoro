@@ -36,19 +36,30 @@ int main() {
             case 'j' :
                 (position == n-1) ? position = n-1 : position++;
                 break;
+
             case 'k' :
                 (position == 0) ? position = 0 : position--;
                 break;
+
             case '\n' :
                 tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
                 if (position == 0) readOldTime(&rep, &sesh, &brk);
-                else if (position == 1) setNewTime(&rep, &sesh, &brk); readOldTime(&rep, &sesh, &brk);
-                esc = 1;
-                break;
+                else if (position == 1) {
+                    printf("How many reps, how long the sesh and break: ");
+                    scanf("%d %d %d", &rep, &sesh, &brk);
+                    setNewTime(rep, sesh, brk);
+                }
+
+                system("mpv sounds/start_sound.wav > /dev/null 2>&1 & disown");
+                system("mpv sounds/start_sound.wav > /dev/null 2>&1 & disown");
+                counter(rep, sesh, brk);
+                system("mpv sounds/stop_sound.wav > /dev/null 2>&1 & disown");
+                system("clear");
+                tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+
             default :
                 break;
         }
-        if (esc == 1) break;
         system("clear");
 
         /* creates struct with window size */
@@ -62,11 +73,6 @@ int main() {
     } while ((sett=getchar()) != 'q');
 
 
-    system("mpv sounds/start_sound.wav > /dev/null 2>&1 & disown");
-    system("mpv sounds/start_sound.wav > /dev/null 2>&1 & disown");
-    counter(rep, sesh, brk);
-    system("mpv sounds/stop_sound.wav > /dev/null 2>&1 & disown");
-    system("clear");
 
     /* reseting terminal to old settings */
     tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
@@ -100,7 +106,8 @@ int counter(int rep, int sesh, int brk) {
 
             switch(getchar()) {
                 case 'q':
-                    exit(EXIT_SUCCESS);
+                    cur_rep = rep;
+                    break;
                 case 'p':
                     printf("Paused ");
                     while(getchar() != 'p') {  }
@@ -111,7 +118,6 @@ int counter(int rep, int sesh, int brk) {
         printTerm(cur_rep, min, sec);
         ++sec;
     }
-    main();
 }
 
 

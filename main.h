@@ -65,11 +65,9 @@ void readOldTime(int *rep, int *sesh, int *brk) {
     fclose(file);
 }
 
-void setNewTime(int *rep, int *sesh, int *brk) {
+void setNewTime(int rep, int sesh, int brk) {
     FILE *file;
     file = fopen("settings.txt", "w");
-    printf("How many reps, how long the sesh and break: ");
-    scanf("%d %d %d", &rep, &sesh, &brk);
     fprintf(file, "%d\n%d\n%d", rep, sesh, brk);
     fclose(file);
 }
