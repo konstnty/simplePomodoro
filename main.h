@@ -20,7 +20,8 @@
 
 
 /* prinitng colored output on linux by adding escape codes before string */
-void textcolor(int attr, int fg) {
+void
+textcolor(int attr, int fg) {
     char command[13];
 
     sprintf(command, "%c[%d;%dm", 0x1B, attr, fg + 30);
@@ -40,18 +41,21 @@ Option* addOption(char* text) {
     return i;
 }
 
-void printOption(const Option *self) {
+void
+printOption(const Option *self) {
     printf(self->text);
 }
 
-void printOptionCol(const Option *self) {
+void
+printOptionCol(const Option *self) {
     textcolor(BRIGHT, RED);
     printOption(self);
     textcolor(RESET, WHITE);
 }
 
 /* reading and saving to settings.txt */
-void readOldTime(int *rep, int *sesh, int *brk) {
+void
+readOldTime(int *rep, int *sesh, int *brk) {
     FILE *file;
     char buffer[5][5];
     int line = 0;
@@ -65,7 +69,8 @@ void readOldTime(int *rep, int *sesh, int *brk) {
     fclose(file);
 }
 
-void setNewTime(int rep, int sesh, int brk) {
+void
+setNewTime(int rep, int sesh, int brk) {
     FILE *file;
     file = fopen("settings.txt", "w");
     fprintf(file, "%d\n%d\n%d", rep, sesh, brk);
